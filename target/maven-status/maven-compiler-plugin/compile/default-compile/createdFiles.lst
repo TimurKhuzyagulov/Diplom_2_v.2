@@ -1,0 +1,11 @@
+OrderApi.class
+Ingredient.class
+OrdersFullPOJO.class
+UserFullPOJO.class
+User.class
+ListIngredients.class
+SpecificationAPI.class
+OrdersPOJO.class
+UserApi.class
+ListUsers.class
+UserPOJO.class
