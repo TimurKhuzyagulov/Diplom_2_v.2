@@ -1,6 +1,11 @@
-public class ListUsers {
+import com.github.javafaker.Faker;
 
-    static User userTestDefault = new User("default_1@mail.ru", "19625", "Dekab_1");
+
+public class ListUsers {
+    static Faker faker = new Faker();
+
+
+    static User userTestDefault = new User("default_1@mail.ru", faker.internet().password(), faker.name().firstName());
     static User userTestWithoutEmail = new User("", "123", "test10");
     static User userTestWithoutPassword = new User("test085@test.ru", "", "test10");
     static User userTestWithoutName = new User("test085@test.ru", "123", "");
@@ -9,5 +14,6 @@ public class ListUsers {
     static User userDataUpd = new User("update32@mail.ru", "", "BIGUser");
     static User userDataUpdWithExistsEmail = new User("up_timur1@asd.ru", "2343221", "BIGUser1");
     static User existsEmail = new User("", "", "up_timur@asd.ru");
+
 
 }

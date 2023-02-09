@@ -32,7 +32,13 @@ public class getOrdersCurrentUserTest {
         ValidatableResponse responseAuth = userApi.authorization(ListUsers.userTestDefault);
         String accessTokenWithPrefix = responseAuth.extract().path("accessToken");
         String accessToken = accessTokenWithPrefix.substring(7);
-        ValidatableResponse responseCreateOrderWithAuth = orderApi.createOrderWithAuth(accessToken, ListIngredients.ingredientsDefoult);
+
+        //десериализуем ответ метода по получение ингредиентов и на его основе формируем тело для запроса по созданию заказа
+        Response responseGetIngredient = given().get("https://stellarburgers.nomoreparties.site/api/ingredients");
+        IngredientFullPOJO ingredientFullPOJO = responseGetIngredient.body().as(IngredientFullPOJO.class);
+        String[] ingredientsString = {ingredientFullPOJO.getData().get(0).get_id(),ingredientFullPOJO.getData().get(1).get_id(),ingredientFullPOJO.getData().get(2).get_id()};
+        Ingredient ingredientDef = new Ingredient(ingredientsString);
+        ValidatableResponse responseCreateOrderWithAuth = orderApi.createOrderWithAuth(accessToken, ingredientDef);
 
         String nameOrder = responseCreateOrderWithAuth.extract().path("name");
 
@@ -49,7 +55,7 @@ public class getOrdersCurrentUserTest {
         Assert.assertTrue(successActual);
 
         Assert.assertEquals(nameOrder, ordersPOJO.get(0).getName());
-        Assert.assertTrue(Arrays.equals(ListIngredients.ingredientsDefoult.getIngredients(), ordersPOJO.get(0).getIngredients()));
+        Assert.assertTrue(Arrays.equals(ingredientDef.getIngredients(), ordersPOJO.get(0).getIngredients()));
 
         userApi.delete(accessToken);
     }

@@ -1,10 +1,12 @@
 import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;
+import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static io.restassured.RestAssured.given;
 import static org.apache.http.HttpStatus.*;
 
 public class createOrderTest {
@@ -23,8 +25,13 @@ public class createOrderTest {
     @Description("Проверка создания заказа без авторизации пользователя")
     public void createOrderWithoutAuthTest() {
 
+        //десериализуем ответ метода по получение ингредиентов и на его основе формируем тело для запроса по созданию заказа
+        Response responseGetIngredient = given().get("https://stellarburgers.nomoreparties.site/api/ingredients");
+        IngredientFullPOJO ingredientFullPOJO = responseGetIngredient.body().as(IngredientFullPOJO.class);
+        String[] ingredientsString = {ingredientFullPOJO.getData().get(0).get_id(),ingredientFullPOJO.getData().get(1).get_id(),ingredientFullPOJO.getData().get(2).get_id()};
+        Ingredient ingredientDef = new Ingredient(ingredientsString);
 
-        ValidatableResponse responseCreateOrderWithoutAuth = orderApi.createOrderWithoutAuth(ListIngredients.ingredientsDefoult);
+        ValidatableResponse responseCreateOrderWithoutAuth = orderApi.createOrderWithoutAuth(ingredientDef);
 
         int statusCode = responseCreateOrderWithoutAuth.extract().statusCode();
         boolean successActual = responseCreateOrderWithoutAuth.extract().path("success");
@@ -42,7 +49,13 @@ public class createOrderTest {
         String accessTokenWithPrefix = responseAuth.extract().path("accessToken");
         String accessToken = accessTokenWithPrefix.substring(7);
 
-        ValidatableResponse responseCreateOrderWithAuth = orderApi.createOrderWithAuth(accessToken, ListIngredients.ingredientsDefoult);
+        //десериализуем ответ метода по получение ингредиентов и на его основе формируем тело для запроса по созданию заказа
+        Response responseGetIngredient = given().get("https://stellarburgers.nomoreparties.site/api/ingredients");
+        IngredientFullPOJO ingredientFullPOJO = responseGetIngredient.body().as(IngredientFullPOJO.class);
+        String[] ingredientsString = {ingredientFullPOJO.getData().get(0).get_id(),ingredientFullPOJO.getData().get(1).get_id(),ingredientFullPOJO.getData().get(2).get_id()};
+        Ingredient ingredientDef = new Ingredient(ingredientsString);
+
+        ValidatableResponse responseCreateOrderWithAuth = orderApi.createOrderWithAuth(accessToken, ingredientDef);
         int statusCode = responseCreateOrderWithAuth.extract().statusCode();
         boolean successActual = responseCreateOrderWithAuth.extract().path("success");
 
